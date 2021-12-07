@@ -15,7 +15,9 @@ class GridWorld:
             file_path=file_path,
             grid_dictionary=grid_dictionary
         )
-        self.values_grid = np.random.random(
+        self.values_grid = np.random.uniform(
+            0,
+            0,
             size=self.rewards_grid.shape
         )
         self.current_state = self.start_state
@@ -26,7 +28,14 @@ class GridWorld:
         """
         """
         if grid_dictionary is None:
-            grid_dictionary = {'#': 0, ' ': 0, '*': -1, 'S': 0, 'R': 1, 'T': 1}
+            grid_dictionary = {
+                '#': 0,
+                ' ': 0,
+                '*': -2,
+                'S': 0,
+                'R': 2,
+                'T': 1
+            }
         with open(file_path) as grid_file:
 
             grid_file = grid_file.read()
@@ -77,7 +86,7 @@ class GridWorld:
         for rew_location in self.trans_rew:
 
             y, x = rew_location
-            self.rewards_grid[y, x] = 1
+            self.rewards_grid[y, x] = 2
 
         return None
 
@@ -151,7 +160,7 @@ class GridWorld:
         self.current_state = state
         if any([all(self.current_state == rew_state) for
                rew_state in self.trans_rew]) and \
-           self.rewards_grid[self.current_state] == 1:
+           self.rewards_grid[self.current_state] == 2:
             self.rewards_grid[self.current_state] = 0
         return None
 
@@ -176,9 +185,10 @@ class GridWorld:
             current_state_grid[y, x] = 1
             return current_state_grid
 
-    def show_grid(self, episode, errors, step, save_path):
+    def show_grid(self, episode, errors, step, save_path, error_buffer=20):
         """
         """
+        errors = errors[-20:]
         errors = errors - np.mean(errors)
 
         rewards_grid = self.get_grid(type_grid='reward')
@@ -188,7 +198,7 @@ class GridWorld:
         fig, axs = plt.subplots(1, 4, figsize=(12, 3))
         axs = axs.flatten()
 
-        reward_cmap_mapper = {1: 'g', -1: 'r', 0: 'w'}
+        reward_cmap_mapper = {1: 'g', -2: 'r', 2: 'gold', 0: 'w'}
         reward_cmap = colors.ListedColormap(
             [reward_cmap_mapper[reward]
                 for reward in np.unique(self.rewards_grid)]

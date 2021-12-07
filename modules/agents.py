@@ -10,7 +10,7 @@ class TDAgent:
     """
     def __init__(self, world, alpha=0.1, gamma=0.9, eps=0.05,
                  salience_factor=1, dopamine_alteration=1,
-                 agent_tag='', error_buffer=20, movement_cost=0.1,
+                 agent_tag='', error_buffer=20, movement_cost=0.01,
                  actions=['up', 'down', 'left', 'right']):
         """
         """
@@ -18,7 +18,10 @@ class TDAgent:
 
         self.actions = actions
         self.world = world
-        self.errors = [0] * error_buffer
+
+        self.error_buffer = error_buffer
+        self.errors_history = [] * error_buffer
+        self.rewards_history = []
         self.attributed_salience = {}
 
         self.alpha = alpha
@@ -43,7 +46,7 @@ class TDAgent:
             """
             """
             new_reward = next_reward * self.salience_factor
-            return min(new_reward, 100)
+            return min(new_reward, 1000)
 
         if next_state in self.attributed_salience:
             new_reward = increment_reward_saliency(
@@ -95,7 +98,7 @@ class TDAgent:
                 next_reward=next_reward,
                 error=error
             )
-        return error, updated_value
+        return error, updated_value, next_state
 
     def pick_action(self):
         """
@@ -104,14 +107,14 @@ class TDAgent:
 
         if np.random.uniform(0, 1) <= self.eps:
             chosen_action = np.random.choice(self.actions)
-            max_error, max_value = self.compute_updated_value(
+            max_error, max_value, next_state = self.compute_updated_value(
                 chosen_action,
                 current_value
             )
         else:
             for index, action in enumerate(self.actions):
 
-                error, updated_value = self.compute_updated_value(
+                error, updated_value, next_state = self.compute_updated_value(
                     action,
                     current_value
                 )
@@ -125,13 +128,15 @@ class TDAgent:
                         max_value = updated_value
                         max_error = error
 
-        log_error = np.log(abs(max_error))
-        p_action = sigmoid(log_error)
+        # we retrieve reward here without the incentive salience alteration
+        self.rewards_history.append(
+            self.world.get_reward(next_state)
+        )
 
-        self.errors = self.errors[1:]
-        self.errors.append(max_error)
-        max_error *= self.dopamine_alteration
         self.world.update_value(max_value)
+        max_error *= self.dopamine_alteration
+        self.errors_history.append(max_error)
+
         return chosen_action
 
     def take_action(self, action):
@@ -142,7 +147,7 @@ class TDAgent:
             self.world.update_state(current_state)
         return None
 
-    def simulate(self, max_iter=1000, verbose=50):
+    def simulate(self, max_iter=1000, max_steps=300, verbose=50):
         """
         """
         iteration = 0
@@ -152,18 +157,22 @@ class TDAgent:
             f'results//figures//{self.agent_tag}//{iteration}'
         )
         sim_summary = pd.DataFrame(
-            columns=['iteration', 'steps']
+            columns=['iteration', 'steps', 'reward', 'error']
         )
         while iteration <= max_iter:
 
-            if self.world.is_terminal():
+            if self.world.is_terminal() or step > max_steps:
                 self.world.reset_state()
                 self.world.reset_reward()
-                self.errors = [0] * 20
                 sim_summary.loc[iteration] = [
                     iteration,
-                    step
+                    step,
+                    np.sum(self.rewards_history),
+                    np.sum(self.errors_history)
                 ]
+                self.errors_history = [0] * self.error_buffer
+                self.rewards_history = []
+
                 iteration += 1
                 step = 0
                 if iteration % verbose == 0:
@@ -175,7 +184,8 @@ class TDAgent:
                 if iteration % verbose == 0:
                     self.world.show_grid(
                         episode=iteration,
-                        errors=self.errors,
+                        errors=self.errors_history,
+                        error_buffer=self.error_buffer,
                         step=step,
                         save_path=f'results//figures//{self.agent_tag}//{iteration}//{step}.png'
                     )
