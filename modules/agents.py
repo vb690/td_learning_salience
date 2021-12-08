@@ -8,9 +8,9 @@ from modules.utilities import create_dir, sigmoid
 class TDAgent:
     """
     """
-    def __init__(self, world, alpha=0.1, gamma=0.9, eps=0.05,
+    def __init__(self, world, alpha=0.1, gamma=0.9, eps=0.2,
                  salience_factor=1, dopamine_alteration=1,
-                 agent_tag='', error_buffer=20, movement_cost=0.01,
+                 agent_tag='', error_buffer=20, movement_cost=0.1,
                  actions=['up', 'down', 'left', 'right']):
         """
         """

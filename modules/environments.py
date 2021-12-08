@@ -17,7 +17,7 @@ class GridWorld:
         )
         self.values_grid = np.random.uniform(
             0,
-            0,
+            1,
             size=self.rewards_grid.shape
         )
         self.current_state = self.start_state
@@ -31,11 +31,15 @@ class GridWorld:
             grid_dictionary = {
                 '#': 0,
                 ' ': 0,
-                '*': -2,
+                '*': -1,
                 'S': 0,
-                'R': 2,
+                'R': 1.5,
                 'T': 1
             }
+            setattr(self, 'grid_dictionary', grid_dictionary)
+        else:
+            setattr(self, 'grid_dictionary', grid_dictionary)
+
         with open(file_path) as grid_file:
 
             grid_file = grid_file.read()
@@ -86,7 +90,7 @@ class GridWorld:
         for rew_location in self.trans_rew:
 
             y, x = rew_location
-            self.rewards_grid[y, x] = 2
+            self.rewards_grid[y, x] = self.grid_dictionary['R']
 
         return None
 
@@ -160,7 +164,7 @@ class GridWorld:
         self.current_state = state
         if any([all(self.current_state == rew_state) for
                rew_state in self.trans_rew]) and \
-           self.rewards_grid[self.current_state] == 2:
+           self.rewards_grid[self.current_state] == self.grid_dictionary['R']:
             self.rewards_grid[self.current_state] = 0
         return None
 
@@ -198,7 +202,14 @@ class GridWorld:
         fig, axs = plt.subplots(1, 4, figsize=(12, 3))
         axs = axs.flatten()
 
-        reward_cmap_mapper = {1: 'g', -2: 'r', 2: 'gold', 0: 'w'}
+        reward_cmap_mapper = {
+            self.grid_dictionary['T']: 'g',
+            self.grid_dictionary['*']: 'r',
+            self.grid_dictionary['R']: 'gold',
+            self.grid_dictionary['S']: 'w',
+            self.grid_dictionary[' ']: 'w',
+            self.grid_dictionary['#']: 'w'
+        }
         reward_cmap = colors.ListedColormap(
             [reward_cmap_mapper[reward]
                 for reward in np.unique(self.rewards_grid)]
@@ -208,7 +219,7 @@ class GridWorld:
         axs[0].matshow(rewards_grid, cmap=reward_cmap)
         axs[0].set_title('Reward')
 
-        axs[1].matshow(values_grid, cmap='viridis')
+        axs[1].matshow(values_grid, cmap='coolwarm')
         axs[1].set_title(f'Value')
 
         axs[2].matshow(current_state_grid, cmap=state_cmap)
