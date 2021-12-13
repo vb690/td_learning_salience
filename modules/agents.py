@@ -2,7 +2,7 @@ import pandas as pd
 
 import numpy as np
 
-from modules.utilities import create_dir
+from modules.utilities.general_utils import create_dir
 
 
 class TDAgent:
@@ -10,7 +10,7 @@ class TDAgent:
     """
     def __init__(self, world=None, alpha=0.1, gamma=0.9, eps=0.2,
                  salience_factor=1, dopamine_alteration=1,
-                 agent_tag='', error_buffer=20, movement_cost=0.1,
+                 agent_tag='', error_buffer=20, movement_cost=0.01,
                  actions=['up', 'down', 'left', 'right']):
         """
         """
@@ -19,9 +19,9 @@ class TDAgent:
         self.actions = actions
         self.world = world
 
-        self.error_buffer = error_buffer
-        self.errors_history = [] * error_buffer
-        self.rewards_history = []
+        self.error_buffer = [0] * error_buffer
+        self.errors_history = 0
+        self.rewards_history = 0
         self.attributed_salience = {}
 
         self.alpha = alpha
@@ -129,13 +129,13 @@ class TDAgent:
                         max_error = error
 
         # we retrieve reward here without the incentive salience alteration
-        self.rewards_history.append(
-            self.world.get_reward(next_state)
-        )
+        self.rewards_history += self.world.get_reward(next_state)
 
         self.world.update_value(max_value)
         max_error *= self.dopamine_alteration
-        self.errors_history.append(max_error)
+        self.errors_history += max_error
+        self.error_buffer = self.error_buffer[1:]
+        self.error_buffer.append(max_error)
 
         return chosen_action
 
@@ -167,11 +167,12 @@ class TDAgent:
                 sim_summary.loc[iteration] = [
                     iteration,
                     step,
-                    np.sum(self.rewards_history),
-                    np.sum(self.errors_history)
+                    self.rewards_history,
+                    self.errors_history
                 ]
-                self.errors_history = [0] * self.error_buffer
-                self.rewards_history = []
+                self.errors_history = 0
+                self.rewards_history = 0
+                self.error_buffer = [0] * len(self.error_buffer)
 
                 iteration += 1
                 step = 0
@@ -184,7 +185,6 @@ class TDAgent:
                 if iteration % verbose == 0:
                     self.world.show_grid(
                         episode=iteration,
-                        errors=self.errors_history,
                         error_buffer=self.error_buffer,
                         step=step,
                         save_path=f'results//figures//{self.agent_tag}//{iteration}//{step}.png'

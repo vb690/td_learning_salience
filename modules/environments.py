@@ -17,7 +17,7 @@ class GridWorld:
         )
         self.values_grid = np.random.uniform(
             0,
-            1,
+            0.1,
             size=self.rewards_grid.shape
         )
         self.current_state = self.start_state
@@ -33,7 +33,7 @@ class GridWorld:
                 ' ': 0,
                 '*': -1,
                 'S': 0,
-                'R': 1.5,
+                'R': 2,
                 'T': 1
             }
             setattr(self, 'grid_dictionary', grid_dictionary)
@@ -163,8 +163,9 @@ class GridWorld:
         """
         self.current_state = state
         if any([all(self.current_state == rew_state) for
-               rew_state in self.trans_rew]) and \
-           self.rewards_grid[self.current_state] == self.grid_dictionary['R']:
+               rew_state in self.trans_rew]): # and \
+           # self.rewards_grid[self.current_state] == self.grid_dictionary['R']:
+            # print(1)
             self.rewards_grid[self.current_state] = 0
         return None
 
@@ -189,11 +190,10 @@ class GridWorld:
             current_state_grid[y, x] = 1
             return current_state_grid
 
-    def show_grid(self, episode, errors, step, save_path, error_buffer=20):
+    def show_grid(self, episode,  error_buffer, step, save_path):
         """
         """
-        errors = errors[-20:]
-        errors = errors - np.mean(errors)
+        error_buffer = error_buffer - np.mean(error_buffer)
 
         rewards_grid = self.get_grid(type_grid='reward')
         values_grid = self.get_grid(type_grid='value')
@@ -225,11 +225,11 @@ class GridWorld:
         axs[2].matshow(current_state_grid, cmap=state_cmap)
         axs[2].set_title(f'State')
 
-        axs[3].plot([i for i in range(len(errors))], errors, c='r')
+        axs[3].plot([i for i in range(len(error_buffer))], error_buffer, c='r')
         yabs_max = abs(max(axs[3].get_ylim(), key=abs))
         axs[3].set_ylim(ymin=-yabs_max, ymax=yabs_max)
         axs[3].set_title(f'Error')
-        axs[3].axvline(len(errors) - 1, linestyle='--', c='k')
+        axs[3].axvline(len(error_buffer) - 1, linestyle='--', c='k')
 
         for index, ax in enumerate(axs):
 
