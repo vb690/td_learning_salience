@@ -190,9 +190,10 @@ class GridWorld:
             current_state_grid[y, x] = 1
             return current_state_grid
 
-    def show_grid(self, episode,  error_buffer, step, save_path):
+    def show_grid(self, episode,  error_buffer, tag, iteration, step):
         """
         """
+        save_path = f'results//figures//{tag}//{iteration}//{step}.png'
         error_buffer = error_buffer - np.mean(error_buffer)
 
         rewards_grid = self.get_grid(type_grid='reward')

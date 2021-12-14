@@ -8,10 +8,9 @@ from modules.utilities.general_utils import create_dir
 class TDAgent:
     """
     """
-    def __init__(self, world=None, alpha=0.1, gamma=0.9, eps=0.2,
-                 salience_factor=1, dopamine_alteration=1,
-                 agent_tag='', error_buffer=20, movement_cost=0.01,
-                 actions=['up', 'down', 'left', 'right']):
+    def __init__(self, world=None, alpha=0.1, gamma=0.9, min_eps=0.05, eps=0.9,
+                 salience_factor=1, agent_tag='', error_buffer=20,
+                 movement_cost=0.05, actions=['up', 'down', 'left', 'right']):
         """
         """
         self.agent_tag = agent_tag
@@ -26,48 +25,47 @@ class TDAgent:
 
         self.alpha = alpha
         self.gamma = gamma
+        self.min_eps = min_eps
         self.eps = eps
-        self.dopamine_alteration = dopamine_alteration
         self.salience_factor = salience_factor
         self.movement_cost = movement_cost
 
-    def td_update(self, current_value, next_value, next_reward):
+    def increment_reward_saliency(self, next_reward, error):
         """
         """
-        error = next_reward + ((self.gamma * next_value) - current_value)
-        error = error * self.dopamine_alteration
-        updated_value = current_value + (self.alpha * error)
-        return error, updated_value
+        new_reward = next_reward * self.salience_factor
+        return np.log2(new_reward)
 
-    def update_salience(self, next_state, next_reward, error):
+    def update_reward_saliency(self, next_state, next_reward, error):
         """
         """
-        def increment_reward_saliency(next_reward, error):
-            """
-            """
-            new_reward = next_reward * self.salience_factor
-            return min(new_reward, 1000)
-
         if next_state in self.attributed_salience:
-            new_reward = increment_reward_saliency(
+            new_reward = self.increment_reward_saliency(
                 next_reward=self.attributed_salience[next_state],
                 error=error
             )
         else:
-            new_reward = increment_reward_saliency(
+            new_reward = self.increment_reward_saliency(
                 next_reward=next_reward,
                 error=error
             )
         self.attributed_salience[next_state] = new_reward
         return None
 
-    def get_salience(self, next_state, next_reward):
+    def get_reward_saliency(self, next_state, next_reward):
         """
         """
         if next_state in self.attributed_salience:
             return self.attributed_salience[next_state]
         else:
             return next_reward
+
+    def td_update(self, current_value, next_value, next_reward):
+        """
+        """
+        error = next_reward + ((self.gamma * next_value) - current_value)
+        updated_value = current_value + (self.alpha * error)
+        return error, updated_value
 
     def compute_updated_value(self, action, current_value):
         """
@@ -82,7 +80,7 @@ class TDAgent:
             next_value = self.world.get_value(next_state)
 
         if all(next_state == self.world.terminal_state):
-            next_reward = self.get_salience(
+            next_reward = self.get_reward_saliency(
                 next_state=next_state,
                 next_reward=next_reward
             )
@@ -93,7 +91,7 @@ class TDAgent:
             next_reward=next_reward - self.movement_cost
         )
         if all(next_state == self.world.terminal_state):
-            self.update_salience(
+            self.update_reward_saliency(
                 next_state=next_state,
                 next_reward=next_reward,
                 error=error
@@ -146,17 +144,21 @@ class TDAgent:
             self.world.update_state(current_state)
         return None
 
-    def simulate(self, max_iter=1000, max_steps=300, verbose=50):
+    def simulate(self, max_iter=1000, max_steps=300, verbose=50,
+                 decay_ratio=3):
         """
         """
         iteration = 0
         step = 0
+        eps_decay = (self.eps - self.min_eps) / (max_iter // decay_ratio)
+
         create_dir(f'results//figures//{self.agent_tag}')
         create_dir(
             f'results//figures//{self.agent_tag}//{iteration}'
         )
+
         sim_summary = pd.DataFrame(
-            columns=['iteration', 'steps', 'reward', 'error']
+            columns=['iteration', 'steps', 'reward', 'error', 'value']
         )
         while iteration <= max_iter:
 
@@ -166,7 +168,8 @@ class TDAgent:
                     iteration,
                     step,
                     self.rewards_history,
-                    self.errors_history
+                    self.errors_history,
+                    self.world.get_grid('value').flatten()
                 ]
                 self.world.reset_state()
                 self.world.reset_reward()
@@ -186,9 +189,14 @@ class TDAgent:
                     self.world.show_grid(
                         episode=iteration,
                         error_buffer=self.error_buffer,
-                        step=step,
-                        save_path=f'results//figures//{self.agent_tag}//{iteration}//{step}.png'
+                        tag=self.agent_tag,
+                        iteration=iteration,
+                        step=step
                     )
                 step += 1
+
+            # linear decay in exploration
+            if self.eps > self.min_eps:
+                self.eps = self.eps - eps_decay
 
         return sim_summary

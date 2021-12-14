@@ -30,6 +30,5 @@ def run_simulation(agent, world, save_name, max_iter=10, max_steps=100,
 
         sim_summary['world'] = world
         sim_summary['agent'] = agent_obj.agent_tag.split('_')[0]
-        sim_summary['value'] = agent_obj.world.get_grid('value').flatten()
 
     return sim_summary
