@@ -113,19 +113,19 @@ class GridWorld:
         self.values_grid[y, x] = value
         return None
 
-    def reset_value(self):
+    def reset_value_grid(self):
         """
         """
         self.values_grid = np.random.random(self.values_grid.shape)
         return None
 
-    def save_value(self, value_path):
+    def save_value_grid(self, value_path):
         """
         """
         np.save(value_path, self.values_grid)
         return None
 
-    def load_value(self, value_path):
+    def load_value_grid(self, value_path):
         """
         """
         self.values_grid = np.load(value_path)

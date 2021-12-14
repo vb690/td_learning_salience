@@ -132,7 +132,6 @@ class TDAgent:
         self.rewards_history += self.world.get_reward(next_state)
 
         self.world.update_value(max_value)
-        max_error *= self.dopamine_alteration
         self.errors_history += max_error
         self.error_buffer = self.error_buffer[1:]
         self.error_buffer.append(max_error)
@@ -162,14 +161,15 @@ class TDAgent:
         while iteration <= max_iter:
 
             if self.world.is_terminal() or step > max_steps:
-                self.world.reset_state()
-                self.world.reset_reward()
+
                 sim_summary.loc[iteration] = [
                     iteration,
                     step,
                     self.rewards_history,
                     self.errors_history
                 ]
+                self.world.reset_state()
+                self.world.reset_reward()
                 self.errors_history = 0
                 self.rewards_history = 0
                 self.error_buffer = [0] * len(self.error_buffer)
