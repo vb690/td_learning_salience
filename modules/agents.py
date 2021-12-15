@@ -8,7 +8,7 @@ from modules.utilities.general_utils import create_dir
 class TDAgent:
     """
     """
-    def __init__(self, world=None, alpha=0.1, gamma=0.9, min_eps=0.05, eps=0.9,
+    def __init__(self, world=None, alpha=0.1, gamma=0.9, min_eps=0.05, eps=0.1,
                  salience_factor=1, agent_tag='', error_buffer=20,
                  movement_cost=0.05, actions=['up', 'down', 'left', 'right']):
         """
@@ -34,7 +34,7 @@ class TDAgent:
         """
         """
         new_reward = next_reward * self.salience_factor
-        return np.log2(new_reward)
+        return min(new_reward, 1000)
 
     def update_reward_saliency(self, next_state, next_reward, error):
         """

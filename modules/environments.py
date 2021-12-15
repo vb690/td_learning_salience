@@ -31,7 +31,7 @@ class GridWorld:
             grid_dictionary = {
                 '#': 0,
                 ' ': 0,
-                '*': -1,
+                '*': -10,
                 'S': 0,
                 'R': 2,
                 'T': 1
