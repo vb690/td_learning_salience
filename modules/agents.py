@@ -105,11 +105,14 @@ class TDAgent:
 
         if np.random.uniform(0, 1) <= self.eps:
             chosen_action = np.random.choice(self.actions)
-            max_error, max_value, next_state = self.compute_updated_value(
+            max_error, max_value, chosen_state = self.compute_updated_value(
                 chosen_action,
                 current_value
             )
         else:
+            # we perfrom sequential action selection, it is very inefficient
+            # but will allow us to plug in the dopamine dreprivation mechanisms
+            # by Mc Clure et al. once we understand how to
             for index, action in enumerate(self.actions):
 
                 error, updated_value, next_state = self.compute_updated_value(
@@ -117,20 +120,23 @@ class TDAgent:
                     current_value
                 )
                 if index == 0:
+                    chosen_state = next_state
                     chosen_action = action
                     max_value = updated_value
                     max_error = error
                 else:
                     if updated_value >= max_value:
+                        chosen_state = chosen_state
                         chosen_action = action
                         max_value = updated_value
                         max_error = error
 
-        # we retrieve reward here without the incentive salience alteration
-        self.rewards_history += self.world.get_reward(next_state)
-
         self.world.update_value(max_value)
+
+        # we retrieve reward here without the incentive salience alteration
+        self.rewards_history += self.world.get_reward(chosen_state)
         self.errors_history += max_error
+
         self.error_buffer = self.error_buffer[1:]
         self.error_buffer.append(max_error)
 

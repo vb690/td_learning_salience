@@ -34,8 +34,12 @@ class GridWorld:
                 '*': -10,
                 'S': 0,
                 'R': 2,
-                'T': 1
+                'T': 1,
             }
+            # we add the codes for incentive salience prone cues
+            grid_dictionary['R.'] = grid_dictionary['R']
+            grid_dictionary['T.'] = grid_dictionary['T']
+
             setattr(self, 'grid_dictionary', grid_dictionary)
         else:
             setattr(self, 'grid_dictionary', grid_dictionary)
@@ -52,9 +56,22 @@ class GridWorld:
                 grid.append(row)
 
         grid = np.array(grid)
-        setattr(self, 'start_state', np.argwhere(grid == 'S').flatten())
-        setattr(self, 'terminal_state', np.argwhere(grid == 'T').flatten())
-        setattr(self, 'trans_rew',  np.argwhere(grid == 'R'))
+        setattr(
+            self,
+            'start_state',
+            np.argwhere(np.char.find(grid, 'S') != -1).flatten()
+        )
+        setattr(
+            self,
+            'terminal_state',
+            np.argwhere(np.char.find(grid, 'T') != -1).flatten()
+        )
+        setattr(
+            self,
+            'trans_rew',
+            np.argwhere(np.char.find(grid, 'R') != -1).flatten()
+        )
+
         grid = np.vectorize(grid_dictionary.get)(grid)
         setattr(self, 'rewards_grid', grid)
         return None
