@@ -68,8 +68,13 @@ class GridWorld:
         )
         setattr(
             self,
+            'salient_state',
+            np.argwhere(np.char.find(grid, '.') != -1)
+        )
+        setattr(
+            self,
             'trans_rew',
-            np.argwhere(np.char.find(grid, 'R') != -1).flatten()
+            np.argwhere(np.char.find(grid, 'R') != -1)
         )
 
         grid = np.vectorize(grid_dictionary.get)(grid)
