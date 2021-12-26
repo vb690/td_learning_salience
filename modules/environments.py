@@ -59,22 +59,47 @@ class GridWorld:
         setattr(
             self,
             'start_state',
-            np.argwhere(np.char.find(grid, 'S') != -1).flatten()
+            np.argwhere(
+                np.char.find(
+                    np.char.lower(grid), 's'
+                ) != -1
+            ).flatten()
         )
         setattr(
             self,
-            'terminal_state',
-            np.argwhere(np.char.find(grid, 'T') != -1).flatten()
-        )
-        setattr(
-            self,
-            'salient_state',
-            np.argwhere(np.char.find(grid, '.') != -1)
+            'terminal_states',
+            np.argwhere(
+                np.char.find(
+                    np.char.lower(grid), 't'
+                ) != -1
+            )
         )
         setattr(
             self,
             'trans_rew',
-            np.argwhere(np.char.find(grid, 'R') != -1)
+            np.argwhere(
+                np.char.find(
+                    np.char.lower(grid), 'r'
+                ) != -1
+            )
+        )
+        salient_transient = np.argwhere(
+            np.char.find(
+                    grid, 'R'
+                ) != -1
+        )
+        salient_terminal = np.argwhere(
+            np.char.find(
+                    grid, 'T'
+                ) != -1
+        )
+
+        setattr(
+            self,
+            'salient_states',
+            np.vstack(
+                [salient_transient, salient_terminal]
+            )
         )
 
         grid = np.vectorize(grid_dictionary.get)(grid)
@@ -84,7 +109,8 @@ class GridWorld:
     def is_terminal(self):
         """
         """
-        terminal = all(self.current_state == self.terminal_state)
+        terminal = any([all(self.current_state == terminal_state) for
+                        terminal_state in self.self.terminal_states])
         return terminal
 
     # ######################### REWARD RELATED FUNCTIONS ######################

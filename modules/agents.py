@@ -79,7 +79,8 @@ class TDAgent:
             next_reward = self.world.get_reward(next_state)
             next_value = self.world.get_value(next_state)
 
-        if all(next_state == self.world.salient_state):
+        if any([all(next_state == salient_state) for
+                salient_state in self.self.world.salient_states]):
             next_reward = self.get_reward_saliency(
                 next_state=next_state,
                 next_reward=next_reward
@@ -90,7 +91,8 @@ class TDAgent:
             next_value=next_value,
             next_reward=next_reward - self.movement_cost
         )
-        if all(next_state == self.world.salient_state):
+        if any([all(next_state == salient_state) for
+                salient_state in self.self.world.salient_states]):
             self.update_reward_saliency(
                 next_state=next_state,
                 next_reward=next_reward,
