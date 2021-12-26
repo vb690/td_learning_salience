@@ -110,7 +110,7 @@ class GridWorld:
         """
         """
         terminal = any([all(self.current_state == terminal_state) for
-                        terminal_state in self.self.terminal_states])
+                        terminal_state in self.terminal_states])
         return terminal
 
     # ######################### REWARD RELATED FUNCTIONS ######################
