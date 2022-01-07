@@ -32,13 +32,13 @@ class GridWorld:
                 '#': 0,
                 ' ': 0,
                 '*': -10,
-                'S': 0,
-                'R': 2,
-                'T': 1,
+                's': 0,
+                'r': 2,
+                't': 1,
             }
-            # we add the codes for incentive salience prone cues
-            grid_dictionary['R.'] = grid_dictionary['R']
-            grid_dictionary['T.'] = grid_dictionary['T']
+            # we add the codes for cues prone to incentive salience
+            grid_dictionary['R'] = grid_dictionary['r']
+            grid_dictionary['T'] = grid_dictionary['t']
 
             setattr(self, 'grid_dictionary', grid_dictionary)
         else:
