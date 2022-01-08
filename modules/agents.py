@@ -10,7 +10,7 @@ class TDAgent:
     """
     def __init__(self, world=None, alpha=0.1, gamma=0.9, min_eps=0.05, eps=0.1,
                  salience_factor=1, agent_tag='', error_buffer=20,
-                 movement_cost=0.05, actions=['up', 'down', 'left', 'right']):
+                 movement_cost=0.01, actions=['up', 'down', 'left', 'right']):
         """
         """
         self.agent_tag = agent_tag
@@ -158,6 +158,7 @@ class TDAgent:
         """
         iteration = 0
         step = 0
+        # we linearly decay the exploration behaviour
         eps_decay = (self.eps - self.min_eps) / (max_iter // decay_ratio)
 
         create_dir(f'results//figures//{self.agent_tag}')

@@ -17,7 +17,7 @@ class GridWorld:
         )
         self.values_grid = np.random.uniform(
             0,
-            0.1,
+            0.01,
             size=self.rewards_grid.shape
         )
         self.current_state = self.start_state
@@ -210,10 +210,10 @@ class GridWorld:
         """
         """
         self.current_state = state
+        # if the current state is a transient reward state
+        # we set the reward value to 0
         if any([all(self.current_state == rew_state) for
-               rew_state in self.trans_rew]): # and \
-           # self.rewards_grid[self.current_state] == self.grid_dictionary['R']:
-            # print(1)
+               rew_state in self.trans_rew]):
             self.rewards_grid[self.current_state] = 0
         return None
 
@@ -248,33 +248,47 @@ class GridWorld:
         values_grid = self.get_grid(type_grid='value')
         current_state_grid = self.get_grid(type_grid='state')
 
-        fig, axs = plt.subplots(1, 4, figsize=(12, 3))
-        axs = axs.flatten()
-
         reward_cmap_mapper = {
-            self.grid_dictionary['T']: 'g',
+            0: 'w',
+            self.grid_dictionary['t']: 'palegreen',
             self.grid_dictionary['*']: 'r',
-            self.grid_dictionary['R']: 'gold',
-            self.grid_dictionary['S']: 'w',
-            self.grid_dictionary[' ']: 'w',
-            self.grid_dictionary['#']: 'w'
+            self.grid_dictionary['r']: 'goldenrod',
+
         }
         reward_cmap = colors.ListedColormap(
             [reward_cmap_mapper[reward]
-                for reward in np.unique(self.rewards_grid)]
+                for reward in np.unique(rewards_grid)]
         )
         state_cmap = colors.ListedColormap(['w', 'k'])
 
-        axs[0].matshow(rewards_grid, cmap=reward_cmap)
+        fig, axs = plt.subplots(1, 4, figsize=(12, 3))
+        axs = axs.flatten()
+
+        axs[0].matshow(
+            rewards_grid,
+            cmap=reward_cmap,
+            vmin=0,
+            vmax=len(reward_cmap.colors)
+        )
         axs[0].set_title('Reward')
 
-        axs[1].matshow(values_grid, cmap='coolwarm')
+        axs[1].matshow(
+            values_grid,
+            cmap='coolwarm'
+        )
         axs[1].set_title(f'Value')
 
-        axs[2].matshow(current_state_grid, cmap=state_cmap)
+        axs[2].matshow(
+            current_state_grid,
+            cmap=state_cmap
+        )
         axs[2].set_title(f'State')
 
-        axs[3].plot([i for i in range(len(error_buffer))], error_buffer, c='r')
+        axs[3].plot(
+            [i for i in range(len(error_buffer))],
+            error_buffer,
+            c='r'
+        )
         yabs_max = abs(max(axs[3].get_ylim(), key=abs))
         axs[3].set_ylim(ymin=-yabs_max, ymax=yabs_max)
         axs[3].set_title(f'Error')
