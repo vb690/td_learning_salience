@@ -256,8 +256,15 @@ class GridWorld:
 
         }
         reward_cmap = colors.ListedColormap(
-            [reward_cmap_mapper[reward]
-                for reward in np.unique(rewards_grid)]
+            [
+                reward_cmap_mapper[reward] for reward in [
+                    0,
+                    self.grid_dictionary['t'],
+                    self.grid_dictionary['*'],
+                    self.grid_dictionary['r']
+                ]
+
+            ]
         )
         state_cmap = colors.ListedColormap(['w', 'k'])
 
@@ -266,9 +273,7 @@ class GridWorld:
 
         axs[0].matshow(
             rewards_grid,
-            cmap=reward_cmap,
-            vmin=0,
-            vmax=len(reward_cmap.colors)
+            cmap=reward_cmap
         )
         axs[0].set_title('Reward')
 
