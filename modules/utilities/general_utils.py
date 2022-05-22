@@ -8,7 +8,7 @@ def sigmoid(x, alpha=1, beta=0):
     """Compute sigmoid of x given midpoint and
     steepness
     """
-    p = 1 / (1 + np.exp(-alpha*(x - beta)))
+    p = 1 / (1 + np.exp(-alpha * (x - beta)))
     return p
 
 
