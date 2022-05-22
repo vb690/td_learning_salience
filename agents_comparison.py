@@ -4,13 +4,13 @@ from multiprocessing import Pool
 
 from modules.utilities.simulation_utils import run_simulation
 
-MAX_ITER = 120
-MAX_STEPS = 100
+MAX_ITER = 1000
+MAX_STEPS = 500
 WORLDS = ['treasure_island', 'grid', 'wall', 'double_wall', 'tbone', 'maze']
 
 agents = [
     {'normal': {}},
-    {'addicted': {'salience_factor': 1.1}}
+    {'addicted': {'salience_factor': 1.5}}
 ]
 
 args = []
@@ -25,7 +25,7 @@ for world in WORLDS:
                 world,
                 MAX_ITER,
                 MAX_STEPS,
-                30
+                20
             )
         )
 

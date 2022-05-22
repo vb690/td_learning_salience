@@ -14,11 +14,11 @@ class TDAgent:
         alpha=0.1,
         gamma=0.9,
         min_eps=0.05,
-        eps=0.1,
+        eps=0.2,
         salience_factor=1,
         agent_tag="",
         error_buffer=20,
-        movement_cost=0.01,
+        movement_cost=0.85,
         actions=("up", "down", "left", "right"),
     ):
         """ """
@@ -143,7 +143,6 @@ class TDAgent:
             # but will allow us to plug in the dopamine deprivation mechanisms
             # by Mc Clure et al. once we understand how to
             # TODO implement more efficient action selection
-
             for index, action in enumerate(self.actions):
                 error, updated_value, next_state = self.compute_updated_value(
                     action, current_value
@@ -174,7 +173,7 @@ class TDAgent:
             raise Exception("Action is None")
         return None
 
-    def simulate(self, max_iter=1000, max_steps=300, verbose=50, decay_ratio=3):
+    def simulate(self, max_iter=1000, max_steps=300, verbose=50, decay_ratio=10):
         """ """
         iteration = 0
         step = 0

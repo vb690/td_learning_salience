@@ -33,7 +33,7 @@ class GridWorld:
                 " ": 0,
                 "*": -10,
                 "s": 0,
-                "r": 0.5,
+                "r": 0.75,
                 "t": 1,
             }
             # we add the codes for cues prone to incentive salience
@@ -63,7 +63,7 @@ class GridWorld:
         salient_terminal = np.argwhere(np.char.find(grid, "T") != -1)
         salient_states = np.vstack([salient_transient, salient_terminal])
 
-        rewards_grid = np.vectorize(grid_dictionary.get)(grid)
+        rewards_grid = np.vectorize(grid_dictionary.get, otypes=[float])(grid)
         return (
             grid_dictionary,
             rewards_grid,
@@ -215,6 +215,11 @@ class GridWorld:
         rewards_colors[rewards_grid == self.grid_dictionary["t"]] = (0, 1, 0)
         rewards_colors[rewards_grid == self.grid_dictionary["*"]] = (1, 0, 0)
         rewards_colors[rewards_grid == self.grid_dictionary["r"]] = (0.780, 0.647, 0)
+
+        for state in self.salient_states:
+            x, y = state
+            if rewards_grid[x, y] != 0:
+                rewards_colors[x, y] = (0.752, 0, 0.780)
 
         state_cmap = colors.ListedColormap(["w", "k"])
 
