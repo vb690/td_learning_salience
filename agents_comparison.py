@@ -4,7 +4,7 @@ from multiprocessing import Pool
 
 from modules.utilities.simulation_utils import run_simulation
 
-MAX_ITER = 1000
+MAX_ITER = 10000
 MAX_STEPS = 500
 WORLDS = ['treasure_island', 'grid', 'wall', 'double_wall', 'tbone', 'maze']
 
@@ -25,7 +25,7 @@ for world in WORLDS:
                 world,
                 MAX_ITER,
                 MAX_STEPS,
-                20
+                2500
             )
         )
 
