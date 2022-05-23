@@ -27,6 +27,6 @@ def run_simulation(
             )
 
         sim_summary["world"] = world
-        sim_summary["agent"] = agent_obj.agent_tag.split("_")[0]
+        sim_summary["agent"] = agent_obj.agent_tag
 
     return sim_summary

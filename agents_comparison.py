@@ -4,13 +4,15 @@ from multiprocessing import Pool
 
 from modules.utilities.simulation_utils import run_simulation
 
-MAX_ITER = 1000
+MAX_ITER = 10000
 MAX_STEPS = 500
 WORLDS = ['treasure_island', 'grid', 'wall', 'double_wall', 'tbone', 'maze']
 
 agents = [
     {'normal': {}},
-    {'addicted': {'salience_factor': 1.5}}
+    {'addicted_001': {'salience_factor': .01}},
+    {'addicted_005': {'salience_factor': .05}},
+    {'addicted_01': {'salience_factor': .1}}
 ]
 
 args = []
@@ -25,12 +27,11 @@ for world in WORLDS:
                 world,
                 MAX_ITER,
                 MAX_STEPS,
-                20
+                2500
             )
         )
 
 if __name__ == '__main__':
-
     pool = Pool()
     sim_summaries = pool.starmap(
         run_simulation,

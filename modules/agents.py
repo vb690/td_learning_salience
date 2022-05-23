@@ -6,7 +6,6 @@ from .utilities.general_utils import create_dir
 
 
 class TDAgent:
-    """ """
 
     def __init__(
         self,
@@ -15,13 +14,26 @@ class TDAgent:
         gamma=0.9,
         min_eps=0.05,
         eps=0.2,
-        salience_factor=1,
+        salience_factor=0,
         agent_tag="",
         error_buffer=20,
         movement_cost=0.85,
         actions=("up", "down", "left", "right"),
     ):
-        """ """
+        """
+
+        Args:
+            world:
+            alpha:
+            gamma:
+            min_eps:
+            eps:
+            salience_factor:
+            agent_tag:
+            error_buffer:
+            movement_cost:
+            actions:
+        """
         self.agent_tag = agent_tag
 
         self.actions = actions
@@ -39,14 +51,30 @@ class TDAgent:
         self.salience_factor = salience_factor
         self.movement_cost = movement_cost
 
-    def increment_reward_saliency(self, next_reward, capacity=100):
-        """ """
-        new_reward = next_reward * self.salience_factor
+    def increment_reward_saliency(self, next_reward, capacity=1000):
+        """
+
+        Args:
+            next_reward:
+            capacity:
+
+        Returns:
+
+        """
+        new_reward = next_reward + self.salience_factor
         # TODO Make this a sigmoid growth
         return min(new_reward, capacity)
 
     def update_reward_saliency(self, next_state, next_reward):
-        """ """
+        """
+
+        Args:
+            next_state:
+            next_reward:
+
+        Returns:
+
+        """
         if next_state in self.attributed_salience:
             new_reward = self.increment_reward_saliency(
                 next_reward=self.attributed_salience[next_state]
@@ -57,20 +85,45 @@ class TDAgent:
         return None
 
     def get_reward_saliency(self, next_state, next_reward):
-        """ """
+        """
+
+        Args:
+            next_state:
+            next_reward:
+
+        Returns:
+
+        """
         if next_state in self.attributed_salience:
             return self.attributed_salience[next_state]
         else:
             return next_reward
 
     def td_update(self, current_value, next_value, next_reward):
-        """ """
+        """
+
+        Args:
+            current_value:
+            next_value:
+            next_reward:
+
+        Returns:
+
+        """
         error = next_reward + ((self.gamma * next_value) - current_value)
         updated_value = current_value + (self.alpha * error)
         return error, updated_value
 
     def compute_updated_value(self, action, current_value):
-        """ """
+        """
+
+        Args:
+            action:
+            current_value:
+
+        Returns:
+
+        """
         legal, next_state = self.world.get_state(action)
         # check legality
         if not legal:
@@ -174,7 +227,17 @@ class TDAgent:
         return None
 
     def simulate(self, max_iter=1000, max_steps=300, verbose=50, decay_ratio=10):
-        """ """
+        """
+
+        Args:
+            max_iter:
+            max_steps:
+            verbose:
+            decay_ratio:
+
+        Returns:
+
+        """
         iteration = 0
         step = 0
         # we linearly decay the exploration behaviour
