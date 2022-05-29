@@ -6,7 +6,6 @@ from .utilities.general_utils import create_dir
 
 
 class TDAgent:
-
     def __init__(
         self,
         world=None,
