@@ -50,7 +50,7 @@ class TDAgent:
         self.salience_factor = salience_factor
         self.movement_cost = movement_cost
 
-    def increment_reward_saliency(self, next_reward, capacity=100):
+    def increment_reward_saliency(self, next_reward, capacity=1000):
         """
 
         Args:
@@ -60,7 +60,7 @@ class TDAgent:
         Returns:
 
         """
-        new_reward = next_reward + self.salience_factor
+        new_reward = next_reward * self.salience_factor
         # TODO Make this a sigmoid growth
         return min(new_reward, capacity)
 
