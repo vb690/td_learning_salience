@@ -5,8 +5,8 @@ from multiprocessing import Pool
 from modules.utilities.simulation_utils import run_simulation
 
 MAX_ITER = 10000
-MAX_STEPS = 500
-WORLDS = ["treasure_island", "grid", "wall", "double_wall", "tbone", "maze"]
+MAX_STEPS = 1000
+WORLDS = ["treasure_island", "grid", "wall", "triple_wall", "tbone", "maze"]
 
 agents = [
     {"normal": {}},

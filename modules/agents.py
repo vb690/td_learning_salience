@@ -9,14 +9,14 @@ class TDAgent:
     def __init__(
         self,
         world=None,
-        alpha=0.1,
-        gamma=0.9,
-        min_eps=0.05,
-        eps=0.2,
+        alpha=.1,
+        gamma=.9,
+        min_eps=.1,
+        eps=.3,
         salience_factor=0,
         agent_tag="",
         error_buffer=20,
-        movement_cost=0.85,
+        movement_cost=.15,
         actions=("up", "down", "left", "right"),
     ):
         """
@@ -50,7 +50,7 @@ class TDAgent:
         self.salience_factor = salience_factor
         self.movement_cost = movement_cost
 
-    def increment_reward_saliency(self, next_reward, capacity=1000):
+    def increment_reward_saliency(self, next_reward, capacity=100):
         """
 
         Args:
@@ -127,18 +127,21 @@ class TDAgent:
         # check legality
         if not legal:
             next_reward = -self.movement_cost
-            next_value = current_value
+            # this is required in case a salient reward is close to a boundary
+            # if we return current_value hitting the boundary would still
+            # be evaluated as the current state, in this way, hitting the boundary has
+            # a repulsive effect proportional to the current state
+            next_value = -abs(current_value)
         else:
             next_reward = self.world.get_reward(next_state)
             next_value = self.world.get_value(next_state)
 
-        if any(
-            [
-                all(next_state == salient_state)
-                for salient_state in self.world.salient_states
-            ]
-        ):
+        saliency_checks = [all(next_state == salient_state) for salient_state in self.world.salient_states]
+        if any(saliency_checks) and next_reward != 0:
             next_reward = self.get_reward_saliency(
+                next_state=next_state, next_reward=next_reward
+            )
+            self.update_reward_saliency(
                 next_state=next_state, next_reward=next_reward
             )
 
@@ -147,13 +150,7 @@ class TDAgent:
             next_value=next_value,
             next_reward=next_reward - self.movement_cost,
         )
-        if any(
-            [
-                all(next_state == salient_state)
-                for salient_state in self.world.salient_states
-            ]
-        ):
-            self.update_reward_saliency(next_state=next_state, next_reward=next_reward)
+
         return error, updated_value, next_state
 
     def _pick_random_action(self, current_value):
