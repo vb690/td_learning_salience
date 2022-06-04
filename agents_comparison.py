@@ -11,8 +11,9 @@ WORLDS = ["treasure_island", "grid", "wall", "triple_wall", "tbone", "maze"]
 agents = [
     {"normal": {}},
     {"addicted_001": {"salience_factor": 1.01}},  # double every 100 iterations
-    {"addicted_005": {"salience_factor": 1.05}},  # double every 20 iterations
     {"addicted_01": {"salience_factor": 1.1}},    # double every 10 iterations
+    {"addicted_01_less_cost": {"salience_factor": 1.1, "movement_cost": .05}},
+    {"addicted_01_more_exploration": {"salience_factor": 1.1, "eps": .5, "min_eps": .3}},
 ]
 
 args = []
