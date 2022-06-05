@@ -9,14 +9,14 @@ class TDAgent:
     def __init__(
         self,
         world=None,
-        alpha=.1,
-        gamma=.9,
-        min_eps=.1,
-        eps=.3,
+        alpha=0.1,
+        gamma=0.9,
+        min_eps=0.1,
+        eps=0.3,
         salience_factor=0,
         agent_tag="",
         error_buffer=20,
-        movement_cost=.15,
+        movement_cost=0.15,
         actions=("up", "down", "left", "right"),
     ):
         """
@@ -136,14 +136,15 @@ class TDAgent:
             next_reward = self.world.get_reward(next_state)
             next_value = self.world.get_value(next_state)
 
-        saliency_checks = [all(next_state == salient_state) for salient_state in self.world.salient_states]
+        saliency_checks = [
+            all(next_state == salient_state)
+            for salient_state in self.world.salient_states
+        ]
         if any(saliency_checks) and next_reward != 0:
             next_reward = self.get_reward_saliency(
                 next_state=next_state, next_reward=next_reward
             )
-            self.update_reward_saliency(
-                next_state=next_state, next_reward=next_reward
-            )
+            self.update_reward_saliency(next_state=next_state, next_reward=next_reward)
 
         error, updated_value = self.td_update(
             current_value=current_value,

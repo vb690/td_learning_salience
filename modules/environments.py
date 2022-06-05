@@ -33,7 +33,7 @@ class GridWorld:
                 " ": 0,
                 "*": -20,
                 "s": 0,
-                "r": .5,
+                "r": 0.5,
                 "t": 1,
             }
             # we add the codes for cues prone to incentive salience
@@ -75,7 +75,10 @@ class GridWorld:
 
     def is_terminal(self):
         """ """
-        terminal_checks = [all(self.current_state == terminal_state) for terminal_state in self.terminal_states]
+        terminal_checks = [
+            all(self.current_state == terminal_state)
+            for terminal_state in self.terminal_states
+        ]
         terminal = any(terminal_checks)
         return terminal
 
