@@ -3,6 +3,8 @@
 # Motivation
 The idea behind this project is to evaluate changes in the behaviour of an agent when mechanisms similar to incentive saliency are introduced inside a simple Temporal Difference Learning algorithm.
 
+Agents equipped with incentive salience mechanisms will be prone to show a bias towards saliency-prone rewards (i.e., violet boxes) while they will treat other rewards (i.e., golden boxes) normally.
+
 # Features
 
 * Create environments using text files.
