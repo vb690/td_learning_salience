@@ -1,10 +1,14 @@
 # Saliency Aware Temporal Difference Learning
 
 # Motivation
+The idea behind this project is to evaluate changes in the behaviour of an agent when mechanisms similar to incentive saliency are introduced inside a simple Temporal Difference Learning algorithm.
 
 # Features
 
-# How to Use
+* Create environments using text files.
+* Parametrically vary the susceptibility of an agent to saliency effects.
+* Simulate the behaviour of different agents within different environments.
+* Analize the results and visualize the behaviour of agents.
 
 # Results
 
